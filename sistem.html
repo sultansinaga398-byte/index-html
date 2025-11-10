@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RumahSehat - Sistem Manajemen Rumah Sakit</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Mengganti font default ke Inter yang lebih modern */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Mengatur agar scrollbar tidak terlalu tebal */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+    <!-- Konfigurasi custom Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Warna tema kesehatan sesuai permintaan
+                        'health-primary': '#0ea5e9', // Biru muda (Sky Blue)
+                        'health-secondary': '#10b981', // Hijau (Emerald)
+                        'health-bg': '#f0f9ff', // Latar belakang biru sangat muda
+                        'health-green-bg': '#f0fdf4', // Latar belakang hijau sangat muda
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Preload font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-health-bg">
+
+    <!-- Header/Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-20">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <!-- Logo dan Nama Aplikasi -->
+            <div class="flex items-center gap-3">
+                <!-- Ikon Rumah Sakit (SVG) -->
+                <svg class="w-8 h-8 text-health-primary" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+                    <path d="M12 9v4"/>
+                    <path d="M10 11h4"/>
+                </svg>
+                <span class="text-2xl font-bold text-gray-800">Rumah<span class="text-health-primary">Sehat</span></span>
+            </div>
+            <!-- Navigasi Tab -->
+            <div class="hidden sm:flex items-center space-x-2">
+                <button data-page="home" class="nav-tab active-tab text-health-primary bg-health-bg font-semibold px-4 py-2 rounded-md">Beranda</button>
+                <button data-page="patients" class_name="nav-tab text-gray-600 hover:text-health-primary hover:bg-health-bg px-4 py-2 rounded-md font-medium">Pasien</button>
+                <button data-page="doctors" class="nav-tab text-gray-600 hover:text-health-primary hover:bg-health-bg px-4 py-2 rounded-md font-medium">Dokter</button>
+                <button data-page="schedules" class="nav-tab text-gray-600 hover:text-health-primary hover:bg-health-bg px-4 py-2 rounded-md font-medium">Jadwal</button>
+            </div>
+        </nav>
+        <!-- Navigasi Tab Mobile -->
+        <div class="sm:hidden flex justify-around p-2 border-t border-gray-200 bg-white">
+            <button data-page="home" class="nav-tab-mobile active-tab-mobile flex flex-col items-center text-health-primary">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span class="text-xs">Beranda</span>
+            </button>
+            <button data-page="patients" class="nav-tab-mobile flex flex-col items-center text-gray-500">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span class="text-xs">Pasien</span>
+            </button>
+            <button data-page="doctors" class="nav-tab-mobile flex flex-col items-center text-gray-500">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 9v4"/><path d="M10 11h4"/></svg>
+                <span class="text-xs">Dokter</span>
+            </button>
+            <button data-page="schedules" class="nav-tab-mobile flex flex-col items-center text-gray-500">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                <span class="text-xs">Jadwal</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- Halaman Beranda -->
+        <section id="page-home" class="page-content">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Selamat Datang di RumahSehat</h2>
+                <p class="text-gray-600 mb-6">Sistem mini untuk mengelola data pasien dan dokter di rumah sakit Anda. Pilih menu di atas untuk memulai.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button data-page="patients" class="page-link-card bg-health-primary text-white p-6 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 flex items-center gap-4">
+                        <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <span class="text-xl font-semibold">Kelola Pasien</span>
+                    </button>
+                    <button data-page="doctors" class="page-link-card bg-health-secondary text-white p-6 rounded-lg shadow-md hover:bg-green-600 transition duration-300 flex items-center gap-4">
+                        <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 9v4"/><path d="M10 11h4"/></svg>
+                        <span class="text-xl font-semibold">Kelola Dokter</span>
+                    </button>
+                    <button data-page="schedules" class="page-link-card bg-gray-600 text-white p-6 rounded-lg shadow-md hover:bg-gray-700 transition duration-300 flex items-center gap-4">
+                        <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        <span class="text-xl font-semibold">Lihat Jadwal</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Halaman Pasien -->
+        <section id="page-patients" class="page-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Manajemen Pasien</h2>
+                <button id="btn-add-patient" class="bg-health-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 flex items-center gap-2">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                    Tambah Pasien
+                </button>
+            </div>
+            <!-- Tabel Pasien -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Umur</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alamat</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keluhan</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patients-list" class="divide-y divide-gray-200">
+                            <!-- Data pasien akan di-render di sini -->
+                            <tr id="patient-empty">
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data pasien.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Halaman Dokter -->
+        <section id="page-doctors" class="page-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Manajemen Dokter</h2>
+                <button id="btn-add-doctor" class="bg-health-secondary text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300 flex items-center gap-2">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                    Tambah Dokter
+                </button>
+            </div>
+            <!-- Tabel Dokter -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Spesialis</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Telepon</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doctors-list" class="divide-y divide-gray-200">
+                            <!-- Data dokter akan di-render di sini -->
+                            <tr id="doctor-empty">
+                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada data dokter.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Halaman Jadwal -->
+        <section id="page-schedules" class="page-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Jadwal Pemeriksaan</h2>
+                <button id="btn-add-schedule" class="bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700 transition duration-300 flex items-center gap-2">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                    Buat Jadwal
+                </button>
+            </div>
+            <!-- Tabel Jadwal -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pasien</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dokter</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keluhan</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedules-list" class="divide-y divide-gray-200">
+                            <!-- Data jadwal akan di-render di sini -->
+                             <tr id="schedule-empty">
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data jadwal.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Form -->
+    <div id="form-modal" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h3 id="modal-title" class="text-xl font-semibold text-gray-800">Modal Title</h3>
+                <button id="btn-close-modal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+            </div>
+            <!-- Form akan diinjeksi di sini -->
+            <form id="modal-form" class="p-6 space-y-4">
+                <div id="modal-body" class="space-y-4">
+                    <!-- Konten form dinamis -->
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                    <button id="btn-cancel-modal" type="button" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-300">
+                        Batal
+                    </button>
+                    <button id="btn-save" type="submit" class="bg-health-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notifikasi Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-health-secondary text-white px-5 py-3 rounded-lg shadow-xl transition-all translate-x-full opacity-0 z-40">
+        <span id="toast-message">Data berhasil disimpan!</span>
+    </div>
+
+    <!-- JavaScript Aplikasi -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- ELEMEN DOM ---
+            const pages = document.querySelectorAll('.page-content');
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const navTabMobiles = document.querySelectorAll('.nav-tab-mobile');
+            const pageLinkCards = document.querySelectorAll('.page-link-card');
+            const modal = document.getElementById('form-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalForm = document.getElementById('modal-form');
+            const btnCloseModal = document.getElementById('btn-close-modal');
+            const btnCancelModal = document.getElementById('btn-cancel-modal');
+            const btnSave = document.getElementById('btn-save');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+
+            // List Tabel
+            const patientsList = document.getElementById('patients-list');
+            const doctorsList = document.getElementById('doctors-list');
+            const schedulesList = document.getElementById('schedules-list');
+
+            // Tombol "Tambah"
+            const btnAddPatient = document.getElementById('btn-add-patient');
+            const btnAddDoctor = document.getElementById('btn-add-doctor');
+            const btnAddSchedule = document.getElementById('btn-add-schedule');
+
+            // Pesan "Kosong"
+            const patientEmpty = document.getElementById('patient-empty');
+            const doctorEmpty = document.getElementById('doctor-empty');
+            const scheduleEmpty = document.getElementById('schedule-empty');
+            
+            // --- STATE APLIKASI ---
+            let currentModule = ''; // 'patient', 'doctor', 'schedule'
+            let editingId = null; // Menyimpan ID item yang sedang diedit
+
+            // --- DATABASE (LocalStorage) ---
+            const getStore = (key) => JSON.parse(localStorage.getItem(key)) || [];
+            const setStore = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+            let db = {
+                patients: getStore('rum_patients'),
+                doctors: getStore('rum_doctors'),
+                schedules: getStore('rum_schedules'),
+            };
+
+            // --- FUNGSI NAVIGASI ---
+            const showPage = (pageId) => {
+                // Sembunyikan semua halaman
+                pages.forEach(page => page.classList.add('hidden'));
+                // Tampilkan halaman yang dipilih
+                document.getElementById(`page-${pageId}`).classList.remove('hidden');
+
+                // Atur tab aktif (Desktop)
+                navTabs.forEach(tab => {
+                    if (tab.dataset.page === pageId) {
+                        tab.classList.add('active-tab', 'text-health-primary', 'bg-health-bg', 'font-semibold');
+                        tab.classList.remove('text-gray-600', 'hover:text-health-primary', 'hover:bg-health-bg', 'font-medium');
+                    } else {
+                        tab.classList.remove('active-tab', 'text-health-primary', 'bg-health-bg', 'font-semibold');
+                        tab.classList.add('text-gray-600', 'hover:text-health-primary', 'hover:bg-health-bg', 'font-medium');
+                    }
+                });
+
+                 // Atur tab aktif (Mobile)
+                navTabMobiles.forEach(tab => {
+                    if (tab.dataset.page === pageId) {
+                        tab.classList.add('active-tab-mobile', 'text-health-primary');
+                        tab.classList.remove('text-gray-500');
+                    } else {
+                        tab.classList.remove('active-tab-mobile', 'text-health-primary');
+                        tab.classList.add('text-gray-500');
+                    }
+                });
+            };
+
+            // Event listener untuk semua tombol navigasi
+            [...navTabs, ...navTabMobiles, ...pageLinkCards].forEach(tab => {
+                tab.addEventListener('click', () => showPage(tab.dataset.page));
+            });
+
+            // --- FUNGSI TOAST/NOTIFIKASI ---
+            const showToast = (message, isSuccess = true) => {
+                toastMessage.textContent = message;
+                toast.classList.toggle('bg-health-secondary', isSuccess);
+                toast.classList.toggle('bg-red-500', !isSuccess);
+                
+                toast.classList.remove('translate-x-full', 'opacity-0');
+                
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                }, 3000);
+            };
+
+            // --- FUNGSI MODAL ---
+            const openModal = (title, formHtml) => {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = formHtml;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            };
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                modalForm.reset();
+                editingId = null;
+                currentModule = '';
+            };
+
+            [btnCloseModal, btnCancelModal].forEach(btn => btn.addEventListener('click', closeModal));
+
+            // --- TEMPLATE FORM ---
+            const getPatientFormHtml = (patient = {}) => `
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
+                    <input type="text" id="name" name="name" value="${patient.name || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                </div>
+                <div>
+                    <label for="age" class="block text-sm font-medium text-gray-700">Umur</label>
+                    <input type="number" id="age" name="age" value="${patient.age || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
+                    <textarea id="address" name="address" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>${patient.address || ''}</textarea>
+                </div>
+                <div>
+                    <label for="complaint" class="block text-sm font-medium text-gray-700">Keluhan</label>
+                    <input type="text" id="complaint" name="complaint" value="${patient.complaint || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                </div>
+            `;
+
+            const getDoctorFormHtml = (doctor = {}) => `
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
+                    <input type="text" id="name" name="name" value="${doctor.name || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                </div>
+                <div>
+                    <label for="specialty" class="block text-sm font-medium text-gray-700">Spesialis</label>
+                    <input type="text" id="specialty" name="specialty" value="${doctor.specialty || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">No. Telepon</label>
+                    <input type="tel" id="phone" name="phone" value="${doctor.phone || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                </div>
+            `;
+
+             const getScheduleFormHtml = (schedule = {}) => {
+                const patientOptions = db.patients.map(p => `<option value="${p.id}" ${schedule.patientId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+                const doctorOptions = db.doctors.map(d => `<option value="${d.id}" ${schedule.doctorId === d.id ? 'selected' : ''}>${d.name} (${d.specialty})</option>`).join('');
+
+                return `
+                <div>
+                    <label for="patientId" class="block text-sm font-medium text-gray-700">Pilih Pasien</label>
+                    <select id="patientId" name="patientId" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                        <option value="">-- Pilih Pasien --</option>
+                        ${patientOptions}
+                    </select>
+                </div>
+                <div>
+                    <label for="doctorId" class="block text-sm font-medium text-gray-700">Pilih Dokter</label>
+                    <select id="doctorId" name="doctorId" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                        <option value="">-- Pilih Dokter --</option>
+                        ${doctorOptions}
+                    </select>
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700">Tanggal Pemeriksaan</label>
+                    <input type="date" id="date" name="date" value="${schedule.date || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-health-primary focus:border-health-primary" required>
+                </div>
+            `;
+            };
+
+            // --- FUNGSI RENDER (CRUD) ---
+
+            // --- PASIEN ---
+            const renderPatients = () => {
+                patientsList.innerHTML = ''; // Kosongkan list
+                if (db.patients.length === 0) {
+                    patientEmpty.style.display = 'table-row';
+                } else {
+                    patientEmpty.style.display = 'none';
+                    db.patients.forEach(p => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">${p.name}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-600">${p.age}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-600">${p.address}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-health-green-bg text-green-800">
+                                    ${p.complaint}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button data-id="${p.id}" class="btn-edit-patient text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                                <button data-id="${p.id}" class="btn-delete-patient text-red-600 hover:text-red-900">Hapus</button>
+                            </td>
+                        `;
+                        patientsList.appendChild(row);
+                    });
+                }
+            };
+
+            btnAddPatient.addEventListener('click', () => {
+                currentModule = 'patient';
+                editingId = null;
+                openModal('Tambah Pasien Baru', getPatientFormHtml());
+            });
+
+            // --- DOKTER ---
+            const renderDoctors = () => {
+                doctorsList.innerHTML = '';
+                if (db.doctors.length === 0) {
+                    doctorEmpty.style.display = 'table-row';
+                } else {
+                     doctorEmpty.style.display = 'none';
+                    db.doctors.forEach(d => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">${d.name}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    ${d.specialty}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-600">${d.phone}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button data-id="${d.id}" class="btn-edit-doctor text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                                <button data-id="${d.id}" class="btn-delete-doctor text-red-600 hover:text-red-900">Hapus</button>
+                            </td>
+                        `;
+                        doctorsList.appendChild(row);
+                    });
+                }
+            };
+
+             btnAddDoctor.addEventListener('click', () => {
+                currentModule = 'doctor';
+                editingId = null;
+                openModal('Tambah Dokter Baru', getDoctorFormHtml());
+            });
+
+            // --- JADWAL ---
+            const renderSchedules = () => {
+                schedulesList.innerHTML = '';
+                if (db.schedules.length === 0) {
+                    scheduleEmpty.style.display = 'table-row';
+                } else {
+                    scheduleEmpty.style.display = 'none';
+                    db.schedules.forEach(s => {
+                        const patient = db.patients.find(p => p.id === s.patientId) || { name: 'N/A', complaint: 'N/A' };
+                        const doctor = db.doctors.find(d => d.id === s.doctorId) || { name: 'N/A', specialty: 'N/A' };
+                        
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">${patient.name}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">${doctor.name}</div>
+                                <div class="text-xs text-gray-500">${doctor.specialty}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-600">${new Date(s.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                            </td>
+                             <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-health-green-bg text-green-800">
+                                    ${patient.complaint}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button data-id="${s.id}" class="btn-delete-schedule text-red-600 hover:text-red-900">Hapus</button>
+                            </td>
+                        `;
+                        schedulesList.appendChild(row);
+                    });
+                }
+            };
+
+             btnAddSchedule.addEventListener('click', () => {
+                currentModule = 'schedule';
+                editingId = null;
+                 if (db.patients.length === 0 || db.doctors.length === 0) {
+                    showToast("Harap isi data pasien dan dokter terlebih dahulu.", false);
+                    return;
+                }
+                openModal('Buat Jadwal Baru', getScheduleFormHtml());
+            });
+
+
+            // --- EVENT HANDLER (Submit Form) ---
+            modalForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(modalForm);
+                const data = Object.fromEntries(formData.entries());
+
+                if (currentModule === 'patient') {
+                    if (editingId) {
+                        // Update
+                        db.patients = db.patients.map(p => p.id === editingId ? { ...p, ...data } : p);
+                    } else {
+                        // Create
+                        db.patients.push({ id: `p_${Date.now()}`, ...data });
+                    }
+                    setStore('rum_patients', db.patients);
+                    renderPatients();
+                    showToast('Data pasien berhasil disimpan!');
+                } 
+                
+                else if (currentModule === 'doctor') {
+                    if (editingId) {
+                        // Update
+                        db.doctors = db.doctors.map(d => d.id === editingId ? { ...d, ...data } : d);
+                    } else {
+                        // Create
+                        db.doctors.push({ id: `d_${Date.now()}`, ...data });
+                    }
+                    setStore('rum_doctors', db.doctors);
+                    renderDoctors();
+                    showToast('Data dokter berhasil disimpan!');
+                }
+
+                else if (currentModule === 'schedule') {
+                    if (editingId) {
+                        // Update (jika diperlukan, saat ini hanya delete)
+                    } else {
+                        // Create
+                        db.schedules.push({ id: `s_${Date.now()}`, ...data });
+                    }
+                    setStore('rum_schedules', db.schedules);
+                    renderSchedules();
+                    showToast('Jadwal berhasil dibuat!');
+                }
+
+                closeModal();
+            });
+
+            // --- EVENT HANDLER (Edit/Delete) ---
+            const handleTableClick = (e) => {
+                const target = e.target;
+                const id = target.dataset.id;
+
+                // Edit Pasien
+                if (target.classList.contains('btn-edit-patient')) {
+                    const patient = db.patients.find(p => p.id === id);
+                    currentModule = 'patient';
+                    editingId = id;
+                    openModal('Edit Data Pasien', getPatientFormHtml(patient));
+                }
+                // Hapus Pasien
+                if (target.classList.contains('btn-delete-patient')) {
+                    if (confirm('Anda yakin ingin menghapus data pasien ini?')) {
+                        db.patients = db.patients.filter(p => p.id !== id);
+                        setStore('rum_patients', db.patients);
+                        renderPatients();
+                        showToast('Data pasien dihapus.');
+                    }
+                }
+
+                 // Edit Dokter
+                if (target.classList.contains('btn-edit-doctor')) {
+                    const doctor = db.doctors.find(d => d.id === id);
+                    currentModule = 'doctor';
+                    editingId = id;
+                    openModal('Edit Data Dokter', getDoctorFormHtml(doctor));
+                }
+                // Hapus Dokter
+                if (target.classList.contains('btn-delete-doctor')) {
+                    if (confirm('Anda yakin ingin menghapus data dokter ini?')) {
+                        db.doctors = db.doctors.filter(d => d.id !== id);
+                        setStore('rum_doctors', db.doctors);
+                        renderDoctors();
+                        showToast('Data dokter dihapus.');
+                    }
+                }
+
+                // Hapus Jadwal
+                if (target.classList.contains('btn-delete-schedule')) {
+                    if (confirm('Anda yakin ingin menghapus jadwal ini?')) {
+                        db.schedules = db.schedules.filter(s => s.id !== id);
+                        setStore('rum_schedules', db.schedules);
+                        renderSchedules();
+                        showToast('Jadwal dihapus.');
+                    }
+                }
+            };
+
+            patientsList.addEventListener('click', handleTableClick);
+            doctorsList.addEventListener('click', handleTableClick);
+            schedulesList.addEventListener('click', handleTableClick);
+
+            // --- INISIALISASI ---
+            showPage('home'); // Tampilkan halaman beranda saat pertama kali load
+            renderPatients();
+            renderDoctors();
+            renderSchedules();
+        });
+    </script>
+</body>
+</html>
